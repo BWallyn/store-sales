@@ -88,3 +88,6 @@ attr = "store_sales.__version__"
 [tool.setuptools.packages.find]
 where = [ "src",]
 namespaces = false
+
+[tool.kedro_telemetry]
+project_id = "b5550d3c10b940c986a5a152e42c8d11"
