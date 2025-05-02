@@ -1,0 +1,9 @@
+# ==== Data preprocessing ====
+
+df_train:
+  type: pandas.CSVDataset
+  filepath: data/01_raw/train.csv
+
+df_transactions:
+  type: pandas.CSVDataset
+  filepath: data/01_raw/transactions.csv
