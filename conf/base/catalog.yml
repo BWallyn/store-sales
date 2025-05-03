@@ -7,3 +7,15 @@ df_train:
 df_transactions:
   type: pandas.CSVDataset
   filepath: data/01_raw/transactions.csv
+
+df_stores:
+  type: pandas.CSVDataset
+  filepath: data/01_raw/stores.csv
+
+df_oil:
+  type: pandas.CSVDataset
+  filepath: data/01_raw/oil.csv
+
+df_holidays:
+  type: pandas.CSVDataset
+  filepath: data/01_raw/holidays_events.csv

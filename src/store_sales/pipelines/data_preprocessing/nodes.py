@@ -24,3 +24,30 @@ def merge_transactions(df: pd.DataFrame, df_transactions: pd.DataFrame) -> pd.Da
         (pd.DataFrame): Merged DataFrame.
     """
     return df.merge(df_transactions, on=["date", "store_nbr"], how="left")
+
+
+def merge_stores(df: pd.DataFrame, df_stores: pd.DataFrame) -> pd.DataFrame:
+    """Merge stores to the datframe based on store number.
+    
+    Args:
+        df (pd.DataFrame): Dataframe to merge stores to.
+        df_stores (pd.DataFrame): Dataframe containing stores.
+
+    Returns:
+        (pd.DataFrame): Merged DataFrame.
+    """
+    return df.merge(df_stores, on="store_nbr", how="left")
+
+
+def merge_on_date(df: pd.DataFrame, df_to_merge: pd.DataFrame) -> pd.DataFrame:
+    """Merge dataframe to the datframe based on date.
+    
+    Args:
+        df (pd.DataFrame): Dataframe to merge using date column.
+        df_to_merge (pd.DataFrame): Dataframe to merge.
+
+    Returns:
+        (pd.DataFrame): Merged DataFrame.
+    """
+    return df.merge(df_to_merge, on="date", how="left")
+
