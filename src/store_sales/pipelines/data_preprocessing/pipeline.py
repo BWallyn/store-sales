@@ -52,6 +52,6 @@ def create_pipeline(**kwargs) -> Pipeline:
             ),
         ],
         inputs=["df_train", "df_test", "df_transactions", "df_stores", "df_oil", "df_holidays"],
-        outputs=["df_train_w_holidays", "df_test_w_holidays"]
+        outputs=["df_train_w_holidays", "df_test_w_holidays"],
         namespace="data_preprocessing",
     )
