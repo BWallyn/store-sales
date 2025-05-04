@@ -38,7 +38,20 @@ def create_pipeline(**kwargs) -> Pipeline:
                 outputs="df_train_w_holidays",
                 name="Merge_holidays_info_to_train",
             ),
+            node(
+                func=merge_stores,
+                inputs=["df_test", "df_stores"],
+                outputs="df_test_w_stores",
+                name="Merge_stores_info_to_test",
+            ),
+            node(
+                func=merge_on_date,
+                inputs=["df_test_w_stores", "df_holidays"],
+                outputs="df_test_w_holidays",
+                name="Merge_holidays_info_to_test",
+            ),
         ],
-        inputs=["df_train", "df_transactions", "df_stores", "df_oil", "df_holidays"],
+        inputs=["df_train", "df_test", "df_transactions", "df_stores", "df_oil", "df_holidays"],
+        outputs=["df_train_w_holidays", "df_test_w_holidays"]
         namespace="data_preprocessing",
     )
