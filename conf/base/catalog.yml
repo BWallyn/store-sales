@@ -1,0 +1,34 @@
+# ==== Data preprocessing ====
+
+df_train:
+  type: pandas.CSVDataset
+  filepath: data/01_raw/train.csv
+
+df_test:
+  type: pandas.CSVDataset
+  filepath: data/01_raw/test.csv
+
+df_transactions:
+  type: pandas.CSVDataset
+  filepath: data/01_raw/transactions.csv
+
+df_stores:
+  type: pandas.CSVDataset
+  filepath: data/01_raw/stores.csv
+
+df_oil:
+  type: pandas.CSVDataset
+  filepath: data/01_raw/oil.csv
+
+df_holidays:
+  type: pandas.CSVDataset
+  filepath: data/01_raw/holidays_events.csv
+
+
+df_train_w_holidays:
+  type: pandas.ParquetDataset
+  filepath: data/02_intermediate/df_train_preprocessed.parquet
+
+df_test_w_holidays:
+  type: pandas.ParquetDataset
+  filepath: data/02_intermediate/df_test_preprocessed.parquet

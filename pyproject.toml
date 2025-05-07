@@ -65,6 +65,8 @@ lint.ignore = [
     "D205", # blank line between summary and description
     "D400", # first line should end with a period, question mark or exclamation point
     "D404", # first word of the docstring should not be "This"
+    "D407", # Missing dashed underline after section
+    "D413", # Missing blank line after section
     "D415", # first line should end with a period, question mark or exclamation point
     "N806", # Variable should be lowercase
 ]
@@ -88,3 +90,6 @@ attr = "store_sales.__version__"
 [tool.setuptools.packages.find]
 where = [ "src",]
 namespaces = false
+
+[tool.kedro_telemetry]
+project_id = "b5550d3c10b940c986a5a152e42c8d11"
