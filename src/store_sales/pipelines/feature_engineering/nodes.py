@@ -35,3 +35,22 @@ def create_date_features(df: pd.DataFrame) -> pd.DataFrame:
         is_year_start = lambda x: x["date"].dt.is_year_start,
         is_year_end = lambda x: x["date"].dt.is_year_end,
     )
+
+
+def create_season_info(df: pd.DataFrame) -> pd.DataFrame:
+    """Create season information based on the month.
+
+    Args:
+        df (pd.DataFrame): Input DataFrame containing a month column.
+
+    Returns:
+        (pd.DataFrame): DataFrame with additional season information.
+    """
+    return df.assign(
+        season = lambda x: x['month'].map({
+            1: 'Winter', 2: 'Winter', 3: 'Spring',
+            4: 'Spring', 5: 'Spring', 6: 'Summer',
+            7: 'Summer', 8: 'Summer', 9: 'Fall',
+            10: 'Fall', 11: 'Fall', 12: 'Winter'
+        })
+    )
