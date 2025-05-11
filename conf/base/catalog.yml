@@ -32,3 +32,14 @@ df_train_w_holidays:
 df_test_w_holidays:
   type: pandas.ParquetDataset
   filepath: data/02_intermediate/df_test_preprocessed.parquet
+
+
+# ==== Feature engineering ====
+
+df_train_w_workday:
+  type: pandas.ParquetDataset
+  filepath: data/04_feature/df_train_w_workday.parquet
+
+df_test_w_workday:
+  type: pandas.ParquetDataset
+  filepath: data/04_feature/df_test_w_workday.parquet
