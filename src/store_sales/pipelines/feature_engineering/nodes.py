@@ -40,6 +40,12 @@ def create_date_features(df: pd.DataFrame) -> pd.DataFrame:
 def create_season_info(df: pd.DataFrame) -> pd.DataFrame:
     """Create season information based on the month.
 
+    The function maps each month to a corresponding season:
+    - Winter: January, February, December (0)
+    - Spring: March, April, May (1)
+    - Summer: June, July, August (2)
+    - Autumn: September, October, November (3)
+
     Args:
         df (pd.DataFrame): Input DataFrame containing a month column.
 
@@ -48,9 +54,10 @@ def create_season_info(df: pd.DataFrame) -> pd.DataFrame:
     """
     return df.assign(
         season = lambda x: x['month'].map({
-            1: 'Winter', 2: 'Winter', 3: 'Spring',
-            4: 'Spring', 5: 'Spring', 6: 'Summer',
-            7: 'Summer', 8: 'Summer', 9: 'Fall',
-            10: 'Fall', 11: 'Fall', 12: 'Winter'
+            1: 0, 2: 0,
+            3: 1, 4: 1, 5: 1,
+            6: 2, 7: 2, 8: 2,
+            9: 3, 10: 3, 11: 3,
+            12: 0
         })
     )
