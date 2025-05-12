@@ -63,13 +63,29 @@ def create_season_info(df: pd.DataFrame) -> pd.DataFrame:
     )
 
 
+def create_holidays_info(df: pd.DataFrame) -> pd.DataFrame:
+    """Create holidays information based on the holidays columns.
+
+    Args:
+        df (pd.DataFrame): Input DataFrame containing holidays information.
+
+    Returns:
+        (pd.DataFrame): Output DataFrame with type of holidays indicators.
+    """
+    return df.assign(
+        is_holiday_national = lambda x: 1 if (x["type_holiday"] == "Holiday" and x["locale"] == "National") else 0,
+        is_holiday_regional = lambda x: 1 if (x["type_holiday"] == "Holiday" and x["locale"] == "Regional") else 0,
+        is_holiday_local = lambda x: 1 if (x["type_holiday"] == "Holiday" and x["locale"] == "Local") else 0,
+    )
+
+
 def create_workday_info(df: pd.DataFrame) -> pd.DataFrame:
     """Create workday information base on the day of the week and the holidays."""
     return df.assign(
         is_workday = lambda x: 0 if (
             x["day_of_week"].isin([6, 7])
-            | x["holiday_national_binary"] == 1
-            | x["holiday_local_binary"] == 1
-            | x["holiday_regional_binary"] == 1
+            | x["is_holiday_national"] == 1
+            | x["is_holiday_local"] == 1
+            | x["is_holiday_regional"] == 1
         ) else 1,
     )
