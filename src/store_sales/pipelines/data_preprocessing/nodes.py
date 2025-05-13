@@ -3,6 +3,8 @@
 # ==== IMPORTS ====
 # =================
 
+from typing import Optional
+
 import pandas as pd
 
 # ===================
@@ -35,15 +37,16 @@ def merge_stores(df: pd.DataFrame, df_stores: pd.DataFrame) -> pd.DataFrame:
     return df.merge(df_stores, on="store_nbr", how="left")
 
 
-def merge_on_date(df: pd.DataFrame, df_to_merge: pd.DataFrame) -> pd.DataFrame:
+def merge_on_date(df: pd.DataFrame, df_to_merge: pd.DataFrame, suffix_y: Optional[str]=None) -> pd.DataFrame:
     """Merge dataframe to the datframe based on date.
 
     Args:
         df (pd.DataFrame): Dataframe to merge using date column.
         df_to_merge (pd.DataFrame): Dataframe to merge.
+        suffix_y (Optional[str]): Suffix to add to the columns of the merged dataframe.
 
     Returns:
         (pd.DataFrame): Merged DataFrame.
     """
-    return df.merge(df_to_merge, on="date", how="left")
+    return df.merge(df_to_merge, on="date", how="left", suffixes=("", suffix_y if suffix_y else ""))
 
