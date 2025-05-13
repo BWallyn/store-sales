@@ -57,7 +57,7 @@ def create_pipeline(**kwargs) -> Pipeline:
             ),
             node(
                 func=create_workday_info,
-                inputs="df_test_w_season",
+                inputs="df_test_w_holidays_ind",
                 outputs="df_test_w_workday",
                 name="Add_workday_info_to_test",
             ),

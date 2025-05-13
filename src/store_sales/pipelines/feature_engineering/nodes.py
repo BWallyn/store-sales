@@ -73,19 +73,20 @@ def create_holidays_info(df: pd.DataFrame) -> pd.DataFrame:
         (pd.DataFrame): Output DataFrame with type of holidays indicators.
     """
     return df.assign(
-        is_holiday_national = lambda x: 1 if (x["type_holiday"] == "Holiday" and x["locale"] == "National") else 0,
-        is_holiday_regional = lambda x: 1 if (x["type_holiday"] == "Holiday" and x["locale"] == "Regional") else 0,
-        is_holiday_local = lambda x: 1 if (x["type_holiday"] == "Holiday" and x["locale"] == "Local") else 0,
+        holiday_type = lambda x: x["type_holidays"] + "_" + x["locale"]
     )
 
 
 def create_workday_info(df: pd.DataFrame) -> pd.DataFrame:
-    """Create workday information base on the day of the week and the holidays."""
-    return df.assign(
-        is_workday = lambda x: 0 if (
-            x["day_of_week"].isin([6, 7])
-            | x["is_holiday_national"] == 1
-            | x["is_holiday_local"] == 1
-            | x["is_holiday_regional"] == 1
-        ) else 1,
-    )
+    """Create workday information base on the day of the week and the holidays.
+
+    Args:
+        df (pd.DataFrame): Input DataFrame containing holiday information.
+
+    Returns:
+        (pd.DataFrame): Output DataFrame with workday information.
+    """
+    df_workday = df.assign(is_workday = 1)
+    df.loc[df["day_of_week"].isin([6, 7]), "is_workday"] = 0
+    df.loc[df["type_holidays"].isin(["Holiday_National", "Holiday_Regional", "Holiday_Local"]), "is_workday"] = 0
+    return df_workday
