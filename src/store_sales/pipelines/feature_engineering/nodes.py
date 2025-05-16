@@ -107,3 +107,23 @@ def create_train_validation_indicators(df: pd.DataFrame, date_split: str) -> pd.
         is_train = lambda x: (x["date"] < date_split).astype(int),
         is_validation = lambda x: (x["date"] >= date_split).astype(int)
     )
+
+
+def create_validation_kfolds_indicators(df: pd.DataFrame, n_days: int, n_folds: int) -> pd.DataFrame:
+    """Add validation indicators for multiple folds to the DataFrame based on the date.
+
+    Args:
+        df (pd.DataFrame): Input DataFrame.
+        n_days (int): Number of days to use for the validation indicator.
+        n_folds (int): Number of folds to create.
+
+    Returns:
+        df (pd.DataFrame): DataFrame with the validation indicators.
+
+    """
+    for fold in range(n_folds):
+        df[f"validation_{fold}"] = df["date"].between(
+            df["date"].max() - pd.Timedelta(days=n_days * (fold + 1)),
+            df["date"].max() - pd.Timedelta(days=n_days * fold)
+        )
+    return df
