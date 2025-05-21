@@ -41,7 +41,7 @@ def create_pipeline(**kwargs) -> Pipeline:
             node(
                 func=create_train_validation_indicators,
                 inputs=["df_train_w_workday", "params:date_split"],
-                outputs="df_w_validation_indicators",
+                outputs="df_train_feature_engineered",
                 name="Add_validation_indicators"
             ),
             node(
@@ -65,11 +65,11 @@ def create_pipeline(**kwargs) -> Pipeline:
             node(
                 func=create_workday_info,
                 inputs="df_test_w_holidays_ind",
-                outputs="df_test_w_workday",
+                outputs="df_test_feature_engineered",
                 name="Add_workday_info_to_test",
             ),
         ],
         namespace="feature_engineering",
         inputs=["df_train_w_holidays", "df_test_w_holidays"],
-        outputs=["df_w_validation_indicators", "df_test_w_workday"],
+        outputs=["df_train_feature_engineered", "df_test_feature_engineered"],
     )
