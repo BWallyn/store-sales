@@ -5,6 +5,7 @@ from store_sales.pipelines.feature_engineering.nodes import (
     create_date_features,
     create_holidays_info,
     create_season_info,
+    create_train_validation_indicators,
     create_workday_info,
 )
 
@@ -38,6 +39,12 @@ def create_pipeline(**kwargs) -> Pipeline:
                 name="Add_workday_info_to_train",
             ),
             node(
+                func=create_train_validation_indicators,
+                inputs=["df_train_w_workday", "params:date_split"],
+                outputs="df_train_feature_engineered",
+                name="Add_validation_indicators"
+            ),
+            node(
                 func=create_date_features,
                 inputs="df_test_w_holidays",
                 outputs="df_test_w_date_feats",
@@ -58,11 +65,11 @@ def create_pipeline(**kwargs) -> Pipeline:
             node(
                 func=create_workday_info,
                 inputs="df_test_w_holidays_ind",
-                outputs="df_test_w_workday",
+                outputs="df_test_feature_engineered",
                 name="Add_workday_info_to_test",
             ),
         ],
         namespace="feature_engineering",
         inputs=["df_train_w_holidays", "df_test_w_holidays"],
-        outputs=["df_train_w_workday", "df_test_w_workday"],
+        outputs=["df_train_feature_engineered", "df_test_feature_engineered"],
     )

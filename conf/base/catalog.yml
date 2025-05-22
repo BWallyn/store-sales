@@ -36,10 +36,10 @@ df_test_w_holidays:
 
 # ==== Feature engineering ====
 
-df_train_w_workday:
+df_train_feature_engineered:
   type: pandas.ParquetDataset
-  filepath: data/04_feature/df_train_w_workday.parquet
+  filepath: data/04_feature/df_train_feature_engineered.parquet
 
-df_test_w_workday:
+df_test_feature_engineered:
   type: pandas.ParquetDataset
-  filepath: data/04_feature/df_test_w_workday.parquet
+  filepath: data/04_feature/df_test_feature_engineered.parquet
