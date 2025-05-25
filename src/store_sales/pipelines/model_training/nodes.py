@@ -40,3 +40,23 @@ def simple_moving_average(df: pd.DataFrame, lags: list[int]) -> pd.DataFrame:
             .sales.mean().shift(60).to_numpy()
         )
     return df_prep
+
+
+def exponential_moving_average(df: pd.DataFrame, alphas: list[float], lags: list[int]) -> pd.DataFrame:
+    """Create exponential moving averages.
+
+    Args:
+        df (pd.DataFrame): The input DataFrame.
+        alphas (list[float]): List of alpha values for exponential moving averages.
+        lags (list[int]): List of lag values to create lag features.
+
+    Returns:
+        (pd.DataFrame): DataFrame with lag features added.
+    """
+    df_prep = df.sort_values(by=["store_nbr", "family", "date"])
+    for alpha in alphas:
+        for lag in lags:
+            df_prep['sales_ewm_alpha_' + str(alpha).replace(".", "") + "_lag_" + str(lag)] = \
+                df_prep.groupby(["store_nbr", "family"])['sales']. \
+                    transform(lambda x: x.shift(lag).ewm(alpha=alpha).mean())  # noqa: B023
+    return df_prep
