@@ -56,7 +56,9 @@ def exponential_moving_average(df: pd.DataFrame, alphas: list[float], lags: list
     df_prep = df.sort_values(by=["store_nbr", "family", "date"])
     for alpha in alphas:
         for lag in lags:
-            df_prep['sales_ewm_alpha_' + str(alpha).replace(".", "") + "_lag_" + str(lag)] = \
-                df_prep.groupby(["store_nbr", "family"])['sales']. \
-                    transform(lambda x: x.shift(lag).ewm(alpha=alpha).mean())  # noqa: B023
+            df_prep['sales_ewm_alpha_' + str(alpha).replace(".", "") + "_lag_" + str(lag)] = (
+                df_prep
+                .groupby(["store_nbr", "family"])['sales']
+                .transform(lambda x: x.shift(lag).ewm(alpha=alpha).mean())  # noqa: B023
+            )
     return df_prep
