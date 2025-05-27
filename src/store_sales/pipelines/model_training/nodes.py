@@ -62,3 +62,25 @@ def exponential_moving_average(df: pd.DataFrame, alphas: list[float], lags: list
                 .transform(lambda x: x.shift(lag).ewm(alpha=alpha).mean())  # noqa: B023
             )
     return df_prep
+
+
+def create_lag_features(df: pd.DataFrame, lags: list[int]) -> pd.DataFrame:
+    """Create lag features for the sales data.
+
+    Args:
+        df (pd.DataFrame): The input DataFrame.
+        lags (list[int]): List of lag values to create lag features.
+
+    Returns:
+        (pd.DataFrame): DataFrame with lag features added.
+    """
+    df_prep = df.sort_values(by=["store_nbr", "family", "date"])
+    for lag in lags:
+        df_prep["sales_lag_" + str(lag)] = (
+            df
+            .groupby(["store_nbr", "family"])['sales']
+            .shift(lag)
+        )
+    return df_prep
+
+
