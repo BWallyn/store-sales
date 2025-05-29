@@ -74,8 +74,8 @@ def merge_train_test(df_train: pd.DataFrame, df_test: pd.DataFrame) -> pd.DataFr
     Returns:
         (pd.DataFrame): Merged DataFrame with train and test data.
     """
-    df_train['is_train'] = 1
-    df_test['is_train'] = 0
+    df_train['is_big_train'] = 1
+    df_test['is_big_train'] = 0
     return pd.concat([df_train, df_test], ignore_index=True)
 
 
