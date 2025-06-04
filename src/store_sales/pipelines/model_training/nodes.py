@@ -4,6 +4,8 @@
 # =================
 
 import pandas as pd
+from sklearn.ensemble import HistGradientBoostingRegressor
+from sklearn.metrics import mean_absolute_percentage_error, root_mean_squared_error
 
 # ===================
 # ==== FUNCTIONS ====
@@ -118,3 +120,74 @@ def create_rolling_mean_features(df: pd.DataFrame, lags: list[int]) -> pd.DataFr
         )
     return df_prep
 
+
+def _train_hgbm(
+    df_train: pd.DataFrame,
+    list_features: list[str],
+    params: dict[str, any],
+    target_name: str = "sales",
+) -> HistGradientBoostingRegressor:
+    """Train a HistGradientBoostingRegressor model.
+
+    Args:
+        df_train (pd.DataFrame): The training DataFrame.
+        list_features (list[str]): List of feature names to use for training.
+        params (dict[str, any]): Parameters for the HistGradientBoostingRegressor model.
+        target_name (str): The name of the target variable.
+
+    Returns:
+        (HistGradientBoostingRegressor): The trained model.
+    """
+    model = HistGradientBoostingRegressor(**params)
+    model.fit(df_train[list_features], df_train[target_name])
+    return model
+
+
+def _compute_metrics(
+    df_train: pd.DataFrame,
+    df_eval: pd.DataFrame,
+    list_features: list[str],
+    model: HistGradientBoostingRegressor,
+    target_name: str = "sales",
+) -> dict[str, any]:
+    """Compute metrics for the model on the training and evaluation DataFrames.
+
+    Args:
+        df_train (pd.DataFrame): The training DataFrame.
+        df_eval (pd.DataFrame): The evaluation DataFrame.
+        list_features (list[str]): List of feature names to use for training.
+        model (HistGradientBoostingRegressor): The trained model.
+        target_name (str): The name of the target variable.
+
+    Returns:
+        (dict[str, any]): Dictionary containing the metrics on training and evaluation DataFrames.
+    """
+    y_train_pred = model.predict(df_train[list_features])
+    y_eval_pred = model.predict(df_eval[list_features])
+
+    return {
+        "rmse_train": root_mean_squared_error(df_train[target_name], y_train_pred),
+        "rmse_eval": root_mean_squared_error(df_eval[target_name], y_eval_pred),
+        "mape_train": mean_absolute_percentage_error(df_train[target_name], y_train_pred),
+        "mape_eval": mean_absolute_percentage_error(df_eval[target_name], y_eval_pred),
+    }
+
+
+def train_model(
+    df_train: pd.DataFrame,
+    df_eval: pd.DataFrame,
+    list_features: list[str],
+    params: dict[str, any],
+    target_name: str = "sales",
+):
+    """Train a model using the training DataFrame and evaluate it on the evaluation DataFrame.
+
+    Args:
+        df_train (pd.DataFrame): The training DataFrame.
+        df_eval (pd.DataFrame): The evaluation DataFrame.
+        list_features (list[str]): List of feature names to use for training.
+        params (dict[str, any]): Parameters for the HistGradientBoostingRegressor model.
+        target_name (str): The name of the target variable.
+    """
+    model = _train_hgbm(df_train, list_features, params, target_name)
+    metrics = _compute_metrics(df_train, df_eval, list_features, model, target_name)
