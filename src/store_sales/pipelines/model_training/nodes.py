@@ -233,7 +233,6 @@ def train_model(  # noqa: PLR0913
     with mlflow.start_run(experiment_id=experiment_id) as run:
         mlflow.set_tag("model_type", "HistGradientBoostingRegressor")
         mlflow.set_tag("target_name", target_name)
-        mlflow.log_params(params)
 
         # Log the features used for training
         mlflow.log_param("features", list_features)
@@ -246,6 +245,7 @@ def train_model(  # noqa: PLR0913
         logger.info("Training the model...")
         model = _train_hgbm(df_train, list_features, params, target_name)
         logger.info("Model trained")
+        mlflow.log_params(model.get_params())
 
         # Compute metrics
         metrics = _compute_metrics(df_train, df_eval, list_features, model, target_name)
