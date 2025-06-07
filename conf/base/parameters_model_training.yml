@@ -3,3 +3,25 @@
 #
 # Documentation for this file format can be found in "Parameters"
 # Link: https://docs.kedro.org/en/0.19.12/configuration/parameters.html
+
+
+# MLflow parameters
+model_training.mlflow_experiment_folder: "mlruns"
+model_training.mlflow_experiment_name: "model_training"
+model_training.mlflow_experiment_id_saved: 232633824225366210
+
+# Lag features
+model_training.lags: [20, 30, 45, 60, 90, 120, 365, 730]
+
+# Model parameters
+model_training.target_name: "sales"
+model_training.list_features: [
+  "store_nbr",
+  "family",
+  "onpromotion",
+  "transactions",
+]
+model_training.hgbm_params:
+  max_iter: 1000
+  learning_rate: 0.01
+  max_depth: 7
