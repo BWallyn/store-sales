@@ -94,6 +94,26 @@ def merge_train_test(df_train: pd.DataFrame, df_test: pd.DataFrame) -> pd.DataFr
     return pd.concat([df_train, df_test], ignore_index=True)
 
 
+def split_train_validation_test(
+    df: pd.DataFrame,
+) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    """Split the DataFrame into train, validation, test and big train DataFrames.
+
+    Args:
+        df (pd.DataFrame): The input DataFrame.
+
+    Returns:
+        (tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]):
+            Tuple containing the train, validation, test and big train DataFrames.
+    """
+    return (
+        df[df["is_train"] == 1],
+        df[df["is_validation"] == 1],
+        df[df["is_big_train"] == 0],
+        df[df["is_big_train"] == 1],
+    )
+
+
 def create_lag_features(df: pd.DataFrame, lags: list[int]) -> pd.DataFrame:
     """Create lag features for the sales data.
 
@@ -230,7 +250,7 @@ def train_model(  # noqa: PLR0913
         experiment_id (str): The ID of the MLflow experiment to log the model and metrics.
         target_name (str): The name of the target variable.
     """
-    with mlflow.start_run(experiment_id=experiment_id) as run:
+    with mlflow.start_run(experiment_id=experiment_id):
         mlflow.set_tag("model_type", "HistGradientBoostingRegressor")
         mlflow.set_tag("target_name", target_name)
 
