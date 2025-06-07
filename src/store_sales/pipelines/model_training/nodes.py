@@ -3,9 +3,22 @@
 # ==== IMPORTS ====
 # =================
 
+import logging
+from typing import Optional
+
+import mlflow
 import pandas as pd
 from sklearn.ensemble import HistGradientBoostingRegressor
 from sklearn.metrics import mean_absolute_percentage_error, root_mean_squared_error
+
+from store_sales.pipelines.model_training.mlflow import (
+    _log_mlflow_metric,
+    _log_model_mlflow,
+    create_mlflow_experiment,
+)
+
+# Options
+logger = logging.getLogger(__name__)
 
 # ===================
 # ==== FUNCTIONS ====
@@ -81,6 +94,26 @@ def merge_train_test(df_train: pd.DataFrame, df_test: pd.DataFrame) -> pd.DataFr
     return pd.concat([df_train, df_test], ignore_index=True)
 
 
+def split_train_validation_test(
+    df: pd.DataFrame,
+) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    """Split the DataFrame into train, validation, test and big train DataFrames.
+
+    Args:
+        df (pd.DataFrame): The input DataFrame.
+
+    Returns:
+        (tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]):
+            Tuple containing the train, validation, test and big train DataFrames.
+    """
+    return (
+        df[df["is_train"] == 1],
+        df[df["is_validation"] == 1],
+        df[df["is_big_train"] == 0],
+        df[df["is_big_train"] == 1],
+    )
+
+
 def create_lag_features(df: pd.DataFrame, lags: list[int]) -> pd.DataFrame:
     """Create lag features for the sales data.
 
@@ -119,6 +152,32 @@ def create_rolling_mean_features(df: pd.DataFrame, lags: list[int]) -> pd.DataFr
             .transform(lambda x: x.shift(1).rolling(window=lag).mean())  # noqa: B023
         )
     return df_prep
+
+
+def create_or_get_mlflow_experiment(
+    experiment_id: Optional[str]=None,
+    experiment_folder: Optional[str]=None,
+    experiment_name: Optional[str]=None,
+) -> str:
+    """Create an MLflow experiment or use an existing one.
+    If experiment_id is not None, use the MLflow experiment of the experiment_id,
+    otherwise, create a MLflow experiment.
+
+    Args:
+        experiment_id (Optional[str]): Experiment id if exists to reuse one
+        experiment_folder (Optional[str]): Folder where to create the experiment
+        experiment_name (Optional[str]): Name of the MLflow experiment
+    Returns:
+        experiment_id (str): Id of the MLflow experiment
+    """
+    if experiment_id is not None:
+        logger.info("Using MLflow experiment id %s", experiment_id)
+    else:
+        experiment_id = create_mlflow_experiment(
+            experiment_folder, experiment_name
+        )
+        logger.info("Creating MLflow experiment %s", experiment_id)
+    return experiment_id
 
 
 def _train_hgbm(
@@ -173,11 +232,12 @@ def _compute_metrics(
     }
 
 
-def train_model(
+def train_model(  # noqa: PLR0913
     df_train: pd.DataFrame,
     df_eval: pd.DataFrame,
     list_features: list[str],
     params: dict[str, any],
+    experiment_id: str,
     target_name: str = "sales",
 ):
     """Train a model using the training DataFrame and evaluate it on the evaluation DataFrame.
@@ -187,7 +247,32 @@ def train_model(
         df_eval (pd.DataFrame): The evaluation DataFrame.
         list_features (list[str]): List of feature names to use for training.
         params (dict[str, any]): Parameters for the HistGradientBoostingRegressor model.
+        experiment_id (str): The ID of the MLflow experiment to log the model and metrics.
         target_name (str): The name of the target variable.
     """
-    model = _train_hgbm(df_train, list_features, params, target_name)
-    metrics = _compute_metrics(df_train, df_eval, list_features, model, target_name)
+    with mlflow.start_run(experiment_id=experiment_id):
+        mlflow.set_tag("model_type", "HistGradientBoostingRegressor")
+        mlflow.set_tag("target_name", target_name)
+
+        # Log the features used for training
+        mlflow.log_param("features", list_features)
+
+        # Log the number of training and evaluation samples
+        mlflow.log_param("n_train_samples", len(df_train))
+        mlflow.log_param("n_eval_samples", len(df_eval))
+
+        # Train the model
+        logger.info("Training the model...")
+        model = _train_hgbm(df_train, list_features, params, target_name)
+        logger.info("Model trained")
+        mlflow.log_params(model.get_params())
+
+        # Compute metrics
+        metrics = _compute_metrics(df_train, df_eval, list_features, model, target_name)
+        _log_mlflow_metric(metrics)
+        logger.info("Metrics logged to MLflow")
+
+        # Log model
+        _log_model_mlflow(model, df=df_train)
+        logger.info("Model logged to MLflow")
+    return model
